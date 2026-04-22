@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Royal Enfield Custom Hub</title>
+    <!-- Only external link is for FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- GLOBAL STYLES --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            background-color: #1a1a1a;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+        .nav-brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        .nav-brand i {
+            color: #b8860b; /* RE Gold */
+            margin-right: 0.5rem;
+            font-size: 1.5rem;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            transition: color 0.2s;
+        }
+        .nav-link:hover {
+            color: #b8860b;
+        }
+        .btn-logout {
+            background-color: #dc2626;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        .btn-register {
+            background-color: #b8860b;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+
+        /* --- FLASH MESSAGES --- */
+        .flash-container {
+            max-width: 1200px;
+            margin: 1rem auto 0;
+            padding: 0 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .flash-message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
+            border-left: 4px solid;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .flash-success { background-color: #d1fae5; color: #047857; border-color: #10b981; }
+        .flash-error { background-color: #fee2e2; color: #b91c1c; border-color: #ef4444; }
+        .flash-info { background-color: #dbeafe; color: #1d4ed8; border-color: #3b82f6; }
+
+        /* --- MAIN CONTENT & FOOTER --- */
+        main {
+            flex-grow: 1;
+        }
+        footer {
+            background-color: #1a1a1a;
+            color: #9ca3af;
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">
+                <i class="fa-solid fa-motorcycle"></i> RE Custom Hub
+            </a>
+            <div class="nav-links">
+                {% if session.user_id %}
+                    <span style="font-size: 0.875rem; color: #d1d5db; margin-right: 10px;">Welcome, {{ session.name }}</span>
+                    {% if session.role == 'admin' %}
+                        <a href="/admin" class="nav-link">Dashboard</a>
+                    {% else %}
+                        <a href="/user" class="nav-link">My Garage</a>
+                    {% endif %}
+                    <a href="/logout" class="btn-logout">Logout</a>
+                {% else %}
+                    <a href="/login" class="nav-link">Login</a>
+                    <a href="/register" class="btn-register">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Royal Enfield Modification Hub. Built with Flask & AWS.</p>
+    </footer>
+
+</body>
+</html>

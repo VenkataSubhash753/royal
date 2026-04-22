@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .quote-container {
+        max-width: 800px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+    }
+    .quote-card {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+    }
+    .quote-header {
+        background: #1a1a1a;
+        color: white;
+        padding: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .quote-title { font-size: 1.875rem; color: #b8860b; margin: 0; text-transform: uppercase; }
+    .quote-ref { color: #9ca3af; font-size: 0.875rem; margin-top: 0.25rem; }
+    
+    .quote-body { padding: 2rem; }
+    .quote-section { margin-bottom: 2rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 1rem; }
+    .quote-section h3 { margin: 0 0 1rem 0; color: #374151; }
+    .quote-text { margin: 0.25rem 0; color: #4b5563; }
+    
+    .mod-table { width: 100%; text-align: left; border-collapse: collapse; margin-bottom: 2rem; }
+    .mod-table th { border-bottom: 2px solid #d1d5db; padding: 0.75rem 0; color: #374151; }
+    .mod-table td { border-bottom: 1px solid #f3f4f6; padding: 0.75rem 0; color: #4b5563; }
+    
+    .pricing-box {
+        background: #f9fafb;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid #e5e7eb;
+        text-align: right;
+        margin-top: 2rem;
+    }
+    .price-row { display: flex; justify-content: flex-end; gap: 2rem; margin-bottom: 0.5rem; color: #4b5563;}
+    .price-row-total { border-top: 1px solid #d1d5db; padding-top: 0.5rem; margin-top: 0.5rem;}
+    .price-val { font-weight: bold; color: #111827; width: 120px; }
+    .price-advance { font-size: 1.25rem; color: #b8860b; }
+    
+    .action-row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .btn-back {
+        padding: 0.75rem 1.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.25rem;
+        color: #374151;
+        text-decoration: none;
+    }
+    .btn-pay {
+        padding: 0.75rem 1.5rem;
+        background: #b8860b;
+        color: white;
+        border-radius: 0.25rem;
+        text-decoration: none;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .btn-disabled {
+        padding: 0.75rem 1.5rem;
+        background: #22c55e;
+        color: white;
+        border-radius: 0.25rem;
+        font-weight: bold;
+        opacity: 0.8;
+        cursor: not-allowed;
+        border: none;
+    }
+</style>
+
+<div class="quote-container">
+    <div class="quote-card">
+        <div class="quote-header">
+            <div>
+                <h1 class="quote-title">Official Quotation</h1>
+                <div class="quote-ref">Order Ref: #{{ order.order_id }}</div>
+            </div>
+            <i class="fa-solid fa-motorcycle" style="font-size: 2.5rem; color: #b8860b;"></i>
+        </div>
+
+        <div class="quote-body">
+            <div class="quote-section">
+                <h3>Project Details</h3>
+                <p class="quote-text"><strong>Base Motorcycle:</strong> {{ bike.name | default('Custom Input') }}</p>
+                <p class="quote-text"><strong>Client Notes:</strong> {{ order.notes if order.notes else 'None provided.' }}</p>
+            </div>
+
+            <table class="mod-table">
+                <thead>
+                    <tr><th>Modifications Requested</th></tr>
+                </thead>
+                <tbody>
+                    {% for mod in mods %}
+                    <tr><td><i class="fa-solid fa-wrench" style="color:#b8860b; margin-right:8px; font-size:0.75rem;"></i> {{ mod.name }}</td></tr>
+                    {% else %}
+                    <tr><td style="font-style:italic; color:#9ca3af;">No standard modifications selected. Custom job.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="pricing-box">
+                <div class="price-row">
+                    <span>Total Project Cost:</span>
+                    <span class="price-val">₹{{ "{:,}".format(order.total_price) }}</span>
+                </div>
+                <div class="price-row price-row-total">
+                    <span>Required Advance (50%):</span>
+                    <span class="price-val price-advance">₹{{ "{:,}".format(order.total_price / 2) }}</span>
+                </div>
+            </div>
+
+            <div class="action-row">
+                <a href="/user" class="btn-back">Back</a>
+                {% if not order.advance_paid %}
+                    <a href="/payment/{{ order.order_id }}/advance" class="btn-pay">Pay 50% Advance Now</a>
+                {% else %}
+                    <button disabled class="btn-disabled"><i class="fa-solid fa-check-circle"></i> Advance Paid</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .payment-container {
+        max-width: 450px;
+        margin: 4rem auto;
+        padding: 0 1rem;
+    }
+    .payment-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border-top: 4px solid #3b82f6; /* Blue for secure payment */
+    }
+    .pay-header { text-align: center; margin-bottom: 2rem; }
+    .pay-header i { font-size: 3rem; color: #3b82f6; margin-bottom: 1rem; }
+    .pay-title { font-size: 1.5rem; font-weight: bold; margin: 0; }
+    .pay-sub { color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem; }
+    
+    .amount-box {
+        background: #f3f4f6;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    .amount-label { font-size: 0.75rem; text-transform: uppercase; color: #6b7280; letter-spacing: 0.05em;}
+    .amount-val { font-size: 2rem; font-weight: 900; margin: 0; color: #111827; }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem; }
+    .form-input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        box-sizing: border-box;
+    }
+    .form-row { display: flex; gap: 1rem; }
+    .form-col { flex: 1; }
+
+    .btn-pay {
+        width: 100%;
+        background: #2563eb;
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 0.375rem;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 1.5rem;
+        box-shadow: 0 4px 6px rgba(37,99,235,0.2);
+    }
+    .btn-pay:hover { background: #1d4ed8; }
+    
+    .mock-warning {
+        text-align: center;
+        font-size: 0.75rem;
+        color: #9ca3af;
+        margin-top: 1rem;
+    }
+</style>
+
+<div class="payment-container">
+    <div class="payment-card">
+        <div class="pay-header">
+            <i class="fa-solid fa-shield-halved"></i>
+            <h2 class="pay-title">Secure Payment</h2>
+            <p class="pay-sub">Paying {{ payment_type.capitalize() }} Amount for Order #{{ order.order_id[:8] }}</p>
+        </div>
+
+        <div class="amount-box">
+            <div class="amount-label">Amount Due</div>
+            <div class="amount-val">₹{{ "{:,.2f}".format(amount) }}</div>
+        </div>
+
+        <form action="/payment/{{ order.order_id }}/{{ payment_type }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Cardholder Name</label>
+                <input type="text" required class="form-input" placeholder="John Doe">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Card Number</label>
+                <input type="text" required pattern="\d{16}" maxlength="16" class="form-input" placeholder="1234 5678 9101 1121">
+            </div>
+            <div class="form-row">
+                <div class="form-group form-col">
+                    <label class="form-label">Expiry</label>
+                    <input type="text" required class="form-input" placeholder="MM/YY">
+                </div>
+                <div class="form-group form-col">
+                    <label class="form-label">CVV</label>
+                    <input type="text" required pattern="\d{3,4}" maxlength="4" class="form-input" placeholder="123">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-pay"><i class="fa-solid fa-lock"></i> Pay ₹{{ "{:,.2f}".format(amount) }}</button>
+        </form>
+        
+        <p class="mock-warning"><i class="fa-solid fa-info-circle"></i> This is a mock payment gateway for demonstration purposes.</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .register-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+        background-color: #f3f4f6;
+        padding: 3rem 1rem;
+    }
+    .register-card {
+        background-color: white;
+        width: 100%;
+        max-width: 400px;
+        padding: 2.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border-top: 4px solid #b8860b; /* RE Gold */
+    }
+    .register-title {
+        text-align: center;
+        font-size: 1.875rem;
+        font-weight: 800;
+        color: #111827;
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+    }
+    .register-subtitle {
+        text-align: center;
+        font-size: 0.875rem;
+        color: #4b5563;
+        margin-bottom: 2rem;
+    }
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    .form-input {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        box-sizing: border-box; /* Ensures padding doesn't affect width */
+        font-family: inherit;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: #b8860b;
+        box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.2);
+    }
+    .submit-btn {
+        width: 100%;
+        background-color: #1a1a1a;
+        color: white;
+        padding: 0.75rem 1rem;
+        border: none;
+        border-radius: 0.375rem;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 1rem;
+        transition: background-color 0.3s;
+    }
+    .submit-btn:hover {
+        background-color: #333333;
+    }
+    .login-link-wrapper {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.875rem;
+    }
+    .login-link {
+        color: #b8860b;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .login-link:hover {
+        color: #9ca3af;
+    }
+</style>
+
+<div class="register-wrapper">
+    <div class="register-card">
+        <h2 class="register-title">Join the Brotherhood</h2>
+        <p class="register-subtitle">Create an account to customize your ride</p>
+        
+        <form action="/register" method="POST">
+            <div class="form-group">
+                <label for="name" class="form-label">Full Name</label>
+                <input id="name" name="name" type="text" required class="form-input" placeholder="John Doe">
+            </div>
+            
+            <div class="form-group">
+                <label for="email" class="form-label">Email address</label>
+                <input id="email" name="email" type="email" required class="form-input" placeholder="john@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input id="password" name="password" type="password" required class="form-input" placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="submit-btn">Register</button>
+            
+            <div class="login-link-wrapper">
+                <a href="/login" class="login-link">Already have an account? Sign in</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

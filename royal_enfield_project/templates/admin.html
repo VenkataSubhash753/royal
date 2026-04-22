@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .admin-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #d1d5db;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+    .admin-title { font-size: 2rem; margin: 0; }
+    .admin-badge {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 0.25rem 1rem;
+        border-radius: 999px;
+        font-weight: bold;
+        font-size: 0.875rem;
+        border: 1px solid #f87171;
+    }
+    
+    .table-wrapper {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        overflow-x: auto;
+    }
+    .table-header-box {
+        padding: 1rem 1.5rem;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+        font-weight: bold;
+        font-size: 1.125rem;
+    }
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .admin-table th {
+        background: #1a1a1a;
+        color: white;
+        text-align: left;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .admin-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        vertical-align: top;
+    }
+    .admin-table tr:hover { background-color: #f9fafb; }
+    
+    .info-sm { font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; }
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        background: #dbeafe; color: #1e40af;
+    }
+    
+    .admin-form { display: flex; flex-direction: column; gap: 0.5rem; max-width: 200px; }
+    .admin-input {
+        padding: 0.25rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+    }
+    .btn-quote {
+        background: #b8860b;
+        color: white;
+        border: none;
+        padding: 0.25rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-size: 0.75rem;
+    }
+</style>
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h1 class="admin-title">Admin Control Center</h1>
+        <span class="admin-badge">System Admin</span>
+    </div>
+
+    <div class="table-wrapper">
+        <div class="table-header-box">All Modification Orders</div>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Order ID / User</th>
+                    <th>Status</th>
+                    <th>Payments</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>
+                        <strong>{{ order.order_id[:8] }}...</strong>
+                        <div class="info-sm">User: {{ order.user_id[:8] }}...</div>
+                    </td>
+                    <td>
+                        <span class="status-badge">{{ order.status }}</span>
+                    </td>
+                    <td>
+                        <div style="font-size: 0.875rem;">Total: ₹{{ order.total_price }}</div>
+                        <div class="info-sm">
+                            Adv: {% if order.advance_paid %}<i class="fa-solid fa-check" style="color:green;"></i>{% else %}<i class="fa-solid fa-xmark" style="color:red;"></i>{% endif %} | 
+                            Full: {% if order.full_paid %}<i class="fa-solid fa-check" style="color:green;"></i>{% else %}<i class="fa-solid fa-xmark" style="color:red;"></i>{% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <form action="/admin/update_order/{{ order.order_id }}" method="POST" class="admin-form">
+                            {% if order.status == 'Requested' %}
+                                <input type="number" name="total_price" placeholder="Total Price (₹)" required class="admin-input">
+                                <input type="hidden" name="status" value="Quotation Generated">
+                                <button type="submit" class="btn-quote">Generate Quote</button>
+                            {% else %}
+                                <select name="status" class="admin-input" onchange="this.form.submit()">
+                                    <option value="Quotation Generated" {% if order.status == 'Quotation Generated' %}selected{% endif %}>Quotation Generated</option>
+                                    <option value="Advance Paid" {% if order.status == 'Advance Paid' %}selected{% endif %}>Advance Paid</option>
+                                    <option value="In Progress" {% if order.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="Completed" {% if order.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                    <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                                </select>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align:center; padding:2rem;">No orders found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ADD BIKE SECTION -->
+    <div class="table-wrapper" style="margin-top: 2rem; border-top: 4px solid #b8860b;">
+        <div class="table-header-box">Add New Pre-Modified Bike to Showroom</div>
+        <div style="padding: 1.5rem;">
+            <form action="/admin/add_bike" method="POST" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
+                    <label class="form-label" style="display:block; margin-bottom:0.5rem; font-size:0.875rem; font-weight:bold;">Bike Name</label>
+                    <input type="text" name="name" required class="admin-input" style="width: 100%; padding: 0.5rem;" placeholder="e.g., Custom Bobber 350">
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label class="form-label" style="display:block; margin-bottom:0.5rem; font-size:0.875rem; font-weight:bold;">Price (₹)</label>
+                    <input type="number" name="price" required class="admin-input" style="width: 100%; padding: 0.5rem;" placeholder="250000">
+                </div>
+                <div style="flex: 2; min-width: 250px;">
+                    <label class="form-label" style="display:block; margin-bottom:0.5rem; font-size:0.875rem; font-weight:bold;">Image URL</label>
+                    <input type="url" name="image_url" required class="admin-input" style="width: 100%; padding: 0.5rem;" placeholder="https://images.unsplash.com/...">
+                </div>
+                <div>
+                    <button type="submit" class="btn-quote" style="padding: 0.6rem 1.5rem; font-size: 0.875rem; font-weight: bold;">Add Bike</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
