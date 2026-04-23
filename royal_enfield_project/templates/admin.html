@@ -67,6 +67,15 @@
         font-weight: bold;
         background: #dbeafe; color: #1e40af;
     }
+    .req-box {
+        background-color: #fef3c7;
+        padding: 0.75rem;
+        border-radius: 0.25rem;
+        border-left: 3px solid #d97706;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #92400e;
+    }
     
     .admin-form { display: flex; flex-direction: column; gap: 0.5rem; max-width: 200px; }
     .admin-input {
@@ -76,14 +85,30 @@
         font-size: 0.875rem;
     }
     .btn-quote {
-        background: #b8860b;
+        background: #16a34a;
         color: white;
         border: none;
-        padding: 0.25rem;
+        padding: 0.5rem;
         border-radius: 0.25rem;
         cursor: pointer;
-        font-size: 0.75rem;
+        font-weight: bold;
+        font-size: 0.875rem;
+        transition: background 0.2s;
     }
+    .btn-quote:hover { background: #15803d; }
+    
+    .btn-primary-dark {
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        font-size: 0.875rem;
+        font-weight: bold;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .btn-primary-dark:hover { background: #333; }
 </style>
 
 <div class="admin-container">
@@ -93,11 +118,11 @@
     </div>
 
     <div class="table-wrapper">
-        <div class="table-header-box">All Modification Orders</div>
+        <div class="table-header-box">Approve Customer Modification Requests</div>
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th>Order ID / User</th>
+                    <th>Order Details</th>
                     <th>Status</th>
                     <th>Payments</th>
                     <th>Actions</th>
@@ -106,9 +131,15 @@
             <tbody>
                 {% for order in orders %}
                 <tr>
-                    <td>
-                        <strong>{{ order.order_id[:8] }}...</strong>
-                        <div class="info-sm">User: {{ order.user_id[:8] }}...</div>
+                    <td style="max-width: 350px;">
+                        <strong>Order: {{ order.order_id[:8] }}...</strong>
+                        <div class="info-sm">User ID: {{ order.user_id[:8] }}...</div>
+                        
+                        <!-- Shows the explicit custom text written by the user -->
+                        <div class="req-box">
+                            <strong>Requested Modifications:</strong><br>
+                            {{ order.custom_mods_text if order.custom_mods_text else 'No specific text provided.' }}
+                        </div>
                     </td>
                     <td>
                         <span class="status-badge">{{ order.status }}</span>
@@ -123,9 +154,9 @@
                     <td>
                         <form action="/admin/update_order/{{ order.order_id }}" method="POST" class="admin-form">
                             {% if order.status == 'Requested' %}
-                                <input type="number" name="total_price" placeholder="Total Price (₹)" required class="admin-input">
+                                <input type="number" name="total_price" placeholder="Enter Approved Quote (₹)" required class="admin-input">
                                 <input type="hidden" name="status" value="Quotation Generated">
-                                <button type="submit" class="btn-quote">Generate Quote</button>
+                                <button type="submit" class="btn-quote"><i class="fa-solid fa-check"></i> Approve & Quote</button>
                             {% else %}
                                 <select name="status" class="admin-input" onchange="this.form.submit()">
                                     <option value="Quotation Generated" {% if order.status == 'Quotation Generated' %}selected{% endif %}>Quotation Generated</option>
@@ -140,20 +171,27 @@
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="4" style="text-align:center; padding:2rem;">No orders found.</td>
+                    <td colspan="4" style="text-align:center; padding:2rem;">No modifications requested yet.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <!-- ADD BIKE SECTION -->
+    <!-- ADD BIKE SECTION & SEED BIKES -->
     <div class="table-wrapper" style="margin-top: 2rem; border-top: 4px solid #b8860b;">
-        <div class="table-header-box">Add New Pre-Modified Bike to Showroom</div>
+        <div class="table-header-box" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Add Vehicle to Showroom</span>
+            <form action="/admin/seed_bikes" method="POST" style="margin: 0;">
+                <button type="submit" class="btn-primary-dark" style="background-color: #b8860b;">
+                    <i class="fa-solid fa-upload"></i> Upload All RE Bikes
+                </button>
+            </form>
+        </div>
         <div style="padding: 1.5rem;">
             <form action="/admin/add_bike" method="POST" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 200px;">
-                    <label class="form-label" style="display:block; margin-bottom:0.5rem; font-size:0.875rem; font-weight:bold;">Bike Name</label>
+                    <label class="form-label" style="display:block; margin-bottom:0.5rem; font-size:0.875rem; font-weight:bold;">Vehicle Name</label>
                     <input type="text" name="name" required class="admin-input" style="width: 100%; padding: 0.5rem;" placeholder="e.g., Custom Bobber 350">
                 </div>
                 <div style="flex: 1; min-width: 150px;">
@@ -165,7 +203,7 @@
                     <input type="url" name="image_url" required class="admin-input" style="width: 100%; padding: 0.5rem;" placeholder="https://images.unsplash.com/...">
                 </div>
                 <div>
-                    <button type="submit" class="btn-quote" style="padding: 0.6rem 1.5rem; font-size: 0.875rem; font-weight: bold;">Add Bike</button>
+                    <button type="submit" class="btn-primary-dark">Add Single Vehicle</button>
                 </div>
             </form>
         </div>
