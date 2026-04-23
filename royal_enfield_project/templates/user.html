@@ -35,32 +35,29 @@
         margin-bottom: 1.5rem;
     }
     
-    .form-group { margin-bottom: 1rem; }
-    .form-label { display: block; font-size: 0.875rem; font-weight: bold; margin-bottom: 0.5rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label { display: block; font-size: 0.875rem; font-weight: bold; margin-bottom: 0.5rem; color: #374151; }
     .form-select, .form-textarea {
         width: 100%;
-        padding: 0.5rem;
+        padding: 0.75rem;
         border: 1px solid #d1d5db;
-        border-radius: 0.25rem;
+        border-radius: 0.375rem;
         box-sizing: border-box;
+        font-family: inherit;
     }
-    .checkbox-list {
-        background: #f9fafb;
-        padding: 1rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 0.25rem;
-    }
-    .checkbox-item { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; }
+    .form-textarea:focus { outline: none; border-color: #b8860b; box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.2); }
     .btn-submit {
         width: 100%;
         background-color: #b8860b;
         color: white;
         padding: 0.75rem;
         border: none;
-        border-radius: 0.25rem;
+        border-radius: 0.375rem;
         font-weight: bold;
         cursor: pointer;
+        transition: background-color 0.2s;
     }
+    .btn-submit:hover { background-color: #d4af37; }
 
     .order-card {
         border-left: 4px solid #b8860b;
@@ -148,12 +145,12 @@
     <div class="dashboard-grid">
         <!-- Left Column: Request Form -->
         <div class="panel panel-req">
-            <h2 class="panel-title"><i class="fa-solid fa-plus-circle" style="color:#b8860b;"></i> New Request</h2>
+            <h2 class="panel-title"><i class="fa-solid fa-plus-circle" style="color:#b8860b;"></i> Request Modification</h2>
             <form action="/order" method="POST">
                 <div class="form-group">
-                    <label class="form-label">Select Base Bike</label>
+                    <label class="form-label">Select Base Vehicle</label>
                     <select name="bike_id" required class="form-select">
-                        <option value="">-- Choose a Bike --</option>
+                        <option value="">-- Choose a Vehicle --</option>
                         {% for bike in bikes %}
                             <option value="{{ bike.bike_id }}">{{ bike.name }}</option>
                         {% endfor %}
@@ -161,23 +158,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Select Modifications</label>
-                    <div class="checkbox-list">
-                        {% for mod in mods %}
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="mods" value="{{ mod.mod_id }}">
-                            {{ mod.name }} (₹{{ mod.base_price }})
-                        </label>
-                        {% endfor %}
-                    </div>
+                    <label class="form-label">Custom Modifications (Detailed Text)</label>
+                    <textarea name="custom_mods_text" rows="5" required class="form-textarea" placeholder="E.g., I want a matte black paint job, an upswept free-flow exhaust, a ribbed cafe racer seat, and a customized headlight..."></textarea>
+                    <p style="font-size:0.75rem; color:#6b7280; margin-top:0.25rem;">Type your exact requirements. Our admin will review and approve a quote.</p>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Additional Notes</label>
-                    <textarea name="notes" rows="3" class="form-textarea" placeholder="Special paint code, etc."></textarea>
-                </div>
-
-                <button type="submit" class="btn-submit">Submit Request</button>
+                <button type="submit" class="btn-submit">Submit Request for Approval</button>
             </form>
         </div>
 
@@ -231,8 +217,8 @@
 
     <!-- SHOWROOM SECTION -->
     <div class="showroom-section">
-        <h2 class="dashboard-title" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-store" style="color:#b8860b;"></i> Pre-Modified Showroom</h2>
-        <p style="color: #6b7280; margin-top: 0;">Skip the wait! Buy a fully modified bike directly.</p>
+        <h2 class="dashboard-title" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-store" style="color:#b8860b;"></i> Available Royal Enfield Fleet</h2>
+        <p style="color: #6b7280; margin-top: 0;">Buy a base bike directly or look at our pre-modified options.</p>
         
         <div class="bikes-grid">
             {% for bike in bikes %}
@@ -247,7 +233,7 @@
                 </div>
             </div>
             {% else %}
-            <p style="color: #6b7280; grid-column: 1 / -1; padding: 2rem; background: white; text-align: center; border-radius: 0.5rem;">No bikes available in the showroom right now.</p>
+            <p style="color: #6b7280; grid-column: 1 / -1; padding: 2rem; background: white; text-align: center; border-radius: 0.5rem;">No bikes available in the showroom right now. Admin needs to upload them.</p>
             {% endfor %}
         </div>
     </div>
