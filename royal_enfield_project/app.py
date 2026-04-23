@@ -10,11 +10,9 @@ app = Flask(__name__)
 app.secret_key = 'super_secret_royal_enfield_key'
 
 # AWS Configuration
-AWS_REGION = 'ap-south-1'
+AWS_REGION = 'us-east-1'
 
 # Initialize Boto3 Resources
-# 🔐 IAM ROLE INTEGRATION: Boto3 automatically fetches credentials securely 
-# from the IAM Role attached to your EC2 instance. NEVER hardcode access keys.
 try:
     dynamodb = boto3.resource('dynamodb', region_name=AWS_REGION)
     sns = boto3.client('sns', region_name=AWS_REGION)
@@ -162,6 +160,39 @@ def add_bike():
 
     return redirect(url_for('admin'))
 
+@app.route('/admin/seed_bikes', methods=['POST'])
+def seed_bikes():
+    if 'user_id' not in session or session.get('role') != 'admin':
+        return redirect(url_for('login'))
+
+    # Upload all main Royal Enfield Models at once
+    re_bikes = [
+        {'name': 'Classic 350', 'price': 193000, 'image_url': 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800&auto=format&fit=crop'},
+        {'name': 'Bullet 350', 'price': 173000, 'image_url': 'https://images.unsplash.com/photo-1558980394-4c7c9299fe96?w=800&auto=format&fit=crop'},
+        {'name': 'Hunter 350', 'price': 149000, 'image_url': 'https://images.unsplash.com/photo-1620546252994-37000300185e?w=800&auto=format&fit=crop'},
+        {'name': 'Meteor 350', 'price': 205000, 'image_url': 'https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=800&auto=format&fit=crop'},
+        {'name': 'Himalayan 450', 'price': 285000, 'image_url': 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800&auto=format&fit=crop'},
+        {'name': 'Continental GT 650', 'price': 319000, 'image_url': 'https://images.unsplash.com/photo-1623055403061-893bd6527b13?w=800&auto=format&fit=crop'},
+        {'name': 'Interceptor 650', 'price': 303000, 'image_url': 'https://images.unsplash.com/photo-1568853762692-0683072fec0a?w=800&auto=format&fit=crop'},
+        {'name': 'Super Meteor 650', 'price': 363000, 'image_url': 'https://images.unsplash.com/photo-1631528148906-89684c3b2462?w=800&auto=format&fit=crop'}
+    ]
+
+    try:
+        for b in re_bikes:
+            bikes_table.put_item(
+                Item={
+                    'bike_id': 'b_' + str(uuid.uuid4())[:8],
+                    'name': b['name'],
+                    'price': b['price'],
+                    'image_url': b['image_url']
+                }
+            )
+        flash('All Royal Enfield bikes uploaded to the database successfully!', 'success')
+    except ClientError as e:
+        flash(f"Error seeding bikes: {e}", 'error')
+
+    return redirect(url_for('admin'))
+
 @app.route('/buy_bike/<bike_id>', methods=['POST'])
 def buy_bike(bike_id):
     if 'user_id' not in session:
@@ -179,7 +210,7 @@ def buy_bike(bike_id):
                 'order_id': order_id,
                 'user_id': session['user_id'],
                 'bike_id': bike_id,
-                'modifications': [],
+                'custom_mods_text': 'None - Pre-Modified Showroom Purchase',
                 'notes': 'Direct Showroom Purchase',
                 'status': 'Quotation Generated',
                 'total_price': int(bike['price']),
@@ -199,7 +230,7 @@ def place_order():
         return redirect(url_for('login'))
         
     bike_id = request.form['bike_id']
-    mod_ids = request.form.getlist('mods') 
+    custom_mods_text = request.form.get('custom_mods_text', '') 
     notes = request.form.get('notes', '')
     
     order_id = str(uuid.uuid4())
@@ -210,7 +241,7 @@ def place_order():
                 'order_id': order_id,
                 'user_id': session['user_id'],
                 'bike_id': bike_id,
-                'modifications': mod_ids,
+                'custom_mods_text': custom_mods_text,
                 'notes': notes,
                 'status': 'Requested',
                 'total_price': 0,
@@ -218,14 +249,7 @@ def place_order():
                 'full_paid': False
             }
         )
-        
-        # Uncomment and configure topic ARN in production for SNS alerts
-        # sns.publish(
-        #     TopicArn='arn:aws:sns:us-east-1:123456789012:AdminNotifications',
-        #     Message=f"New modification request {order_id} received from user {session['name']}."
-        # )
-        
-        flash('Modification request submitted successfully!', 'success')
+        flash('Modification request submitted successfully! Waiting for Admin approval.', 'success')
     except ClientError as e:
         flash(f"Failed to submit order: {e}", 'error')
         
@@ -254,7 +278,7 @@ def update_order(order_id):
             ExpressionAttributeNames=expr_attrs,
             ExpressionAttributeValues=expr_vals
         )
-        flash(f'Order {order_id} updated successfully.', 'success')
+        flash(f'Order {order_id} approved and updated successfully.', 'success')
     except ClientError as e:
         flash(f"Update failed: {e}", 'error')
         
@@ -273,18 +297,12 @@ def quotation(order_id):
             return redirect(url_for('user_dashboard'))
             
         bike = bikes_table.get_item(Key={'bike_id': order['bike_id']}).get('Item', {})
-        
-        mod_details = []
-        for mod_id in order.get('modifications', []):
-            mod = mods_table.get_item(Key={'mod_id': mod_id}).get('Item', {})
-            if mod:
-                mod_details.append(mod)
                 
     except ClientError as e:
         flash("Error retrieving quotation details.", 'error')
         return redirect(url_for('user_dashboard'))
         
-    return render_template('quotation.html', order=order, bike=bike, mods=mod_details)
+    return render_template('quotation.html', order=order, bike=bike)
 
 @app.route('/payment/<order_id>/<payment_type>', methods=['GET', 'POST'])
 def payment(order_id, payment_type):
@@ -323,21 +341,5 @@ def payment(order_id, payment_type):
         
     return render_template('payment.html', order=order, amount=amount, payment_type=payment_type)
 
-def initialize_db():
-    """Helper to mock initial data if tables are empty/new."""
-    try:
-        if not bikes_table.scan()['Items']:
-            bikes_table.put_item(Item={'bike_id': 'b1', 'name': 'Classic 350', 'price': 190000, 'image_url': 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800&auto=format&fit=crop'})
-            bikes_table.put_item(Item={'bike_id': 'b2', 'name': 'Continental GT 650', 'price': 310000, 'image_url': 'https://images.unsplash.com/photo-1623055403061-893bd6527b13?w=800&auto=format&fit=crop'})
-        
-        if not mods_table.scan()['Items']:
-            mods_table.put_item(Item={'mod_id': 'm1', 'name': 'Custom Matte Paint', 'base_price': 15000})
-            mods_table.put_item(Item={'mod_id': 'm2', 'name': 'Performance Exhaust', 'base_price': 8000})
-            mods_table.put_item(Item={'mod_id': 'm3', 'name': 'Touring Seats', 'base_price': 4500})
-            mods_table.put_item(Item={'mod_id': 'm4', 'name': 'Alloy Wheels', 'base_price': 12000})
-    except Exception as e:
-        pass
-
 if __name__ == '__main__':
-    # initialize_db() # Uncomment this locally on first run to populate DB
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True, port=5000)
