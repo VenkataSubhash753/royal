@@ -167,14 +167,14 @@ def seed_bikes():
 
     # Upload all main Royal Enfield Models at once
     re_bikes = [
-        {'name': 'Classic 350', 'price': 193000, 'image_url': 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800&auto=format&fit=crop'},
-        {'name': 'Bullet 350', 'price': 173000, 'image_url': 'https://images.unsplash.com/photo-1558980394-4c7c9299fe96?w=800&auto=format&fit=crop'},
-        {'name': 'Hunter 350', 'price': 149000, 'image_url': 'https://images.unsplash.com/photo-1620546252994-37000300185e?w=800&auto=format&fit=crop'},
-        {'name': 'Meteor 350', 'price': 205000, 'image_url': 'https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=800&auto=format&fit=crop'},
-        {'name': 'Himalayan 450', 'price': 285000, 'image_url': 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800&auto=format&fit=crop'},
-        {'name': 'Continental GT 650', 'price': 319000, 'image_url': 'https://images.unsplash.com/photo-1623055403061-893bd6527b13?w=800&auto=format&fit=crop'},
-        {'name': 'Interceptor 650', 'price': 303000, 'image_url': 'https://images.unsplash.com/photo-1568853762692-0683072fec0a?w=800&auto=format&fit=crop'},
-        {'name': 'Super Meteor 650', 'price': 363000, 'image_url': 'https://images.unsplash.com/photo-1631528148906-89684c3b2462?w=800&auto=format&fit=crop'}
+        {'name': 'Classic 350', 'price': 193000, 'image_url': 'https://krazyhorse.co.uk/cdn/shop/files/SN3984ROYALENFIELDCLASSIC350STEALTHBLACK-1_2000x.jpg?v=1773938573'},
+        {'name': 'Bullet 350', 'price': 173000, 'image_url': 'https://cdn.motor1.com/images/mgl/9mNq8X/354:0:1080:1080/royal-enfield-bullet-350---black-gold.webp'},
+        {'name': 'Hunter 350', 'price': 149000, 'image_url': 'https://i.cdn.newsbytesapp.com/images/l1420220821161819.jpeg'},
+        {'name': 'Meteor 350', 'price': 205000, 'image_url':  'https://www.rushlane.com/wp-content/uploads/2020/12/royal-enfield-meteor-350-sales-nov-2020-1-854x854.jpg'},
+        {'name': 'Himalayan 450', 'price': 285000, 'image_url': 'https://imgd.aeplcdn.com/1280x720/n/cw/ec/110431/himalayan-450-left-front-three-quarter-2.jpeg?isig=0'},
+        {'name': 'Continental GT 650', 'price': 319000, 'image_url': 'https://cdn.bikedekho.com/upload/userreviewimages/69074842cc14e.jpg'},
+        {'name': 'Interceptor 650', 'price': 303000, 'image_url': 'https://i.ytimg.com/vi/riAYjJ1XNmk/maxresdefault.jpg'},
+        {'name': 'Super Meteor 650', 'price': 363000, 'image_url': 'https://thenordicriders.com/wp-content/uploads/2025/07/RE_SuperMeteor650.png'}
     ]
 
     try:
