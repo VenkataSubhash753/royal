@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.secret_key = 'super_secret_royal_enfield_key'
 
 # AWS Configuration
-AWS_REGION = 'us-east-1'
+AWS_REGION = 'ap-south-1'
 
 # Initialize Boto3 Resources
 try:
