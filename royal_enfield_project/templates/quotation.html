@@ -30,9 +30,13 @@
     .quote-section h3 { margin: 0 0 1rem 0; color: #374151; }
     .quote-text { margin: 0.25rem 0; color: #4b5563; }
     
-    .mod-table { width: 100%; text-align: left; border-collapse: collapse; margin-bottom: 2rem; }
-    .mod-table th { border-bottom: 2px solid #d1d5db; padding: 0.75rem 0; color: #374151; }
-    .mod-table td { border-bottom: 1px solid #f3f4f6; padding: 0.75rem 0; color: #4b5563; }
+    .custom-mods-box {
+        background: #f9fafb;
+        border-left: 4px solid #b8860b;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-radius: 0.25rem;
+    }
     
     .pricing-box {
         background: #f9fafb;
@@ -85,7 +89,7 @@
     <div class="quote-card">
         <div class="quote-header">
             <div>
-                <h1 class="quote-title">Official Quotation</h1>
+                <h1 class="quote-title">Approved Quotation</h1>
                 <div class="quote-ref">Order Ref: #{{ order.order_id }}</div>
             </div>
             <i class="fa-solid fa-motorcycle" style="font-size: 2.5rem; color: #b8860b;"></i>
@@ -95,25 +99,17 @@
             <div class="quote-section">
                 <h3>Project Details</h3>
                 <p class="quote-text"><strong>Base Motorcycle:</strong> {{ bike.name | default('Custom Input') }}</p>
-                <p class="quote-text"><strong>Client Notes:</strong> {{ order.notes if order.notes else 'None provided.' }}</p>
+                <p class="quote-text"><strong>Status:</strong> Approved & Quoted by Admin</p>
             </div>
 
-            <table class="mod-table">
-                <thead>
-                    <tr><th>Modifications Requested</th></tr>
-                </thead>
-                <tbody>
-                    {% for mod in mods %}
-                    <tr><td><i class="fa-solid fa-wrench" style="color:#b8860b; margin-right:8px; font-size:0.75rem;"></i> {{ mod.name }}</td></tr>
-                    {% else %}
-                    <tr><td style="font-style:italic; color:#9ca3af;">No standard modifications selected. Custom job.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="custom-mods-box">
+                <h3 style="margin-top: 0; color: #374151; font-size: 1.125rem;">Your Approved Requests:</h3>
+                <p class="quote-text" style="white-space: pre-wrap;">{{ order.custom_mods_text if order.custom_mods_text else 'No detailed modifications provided.' }}</p>
+            </div>
 
             <div class="pricing-box">
                 <div class="price-row">
-                    <span>Total Project Cost:</span>
+                    <span>Approved Project Cost:</span>
                     <span class="price-val">₹{{ "{:,}".format(order.total_price) }}</span>
                 </div>
                 <div class="price-row price-row-total">
