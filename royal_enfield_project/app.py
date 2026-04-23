@@ -342,4 +342,4 @@ def payment(order_id, payment_type):
     return render_template('payment.html', order=order, amount=amount, payment_type=payment_type)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+   app.run(host='0.0.0.0', port=5000, debug=True)
